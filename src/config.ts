@@ -18,8 +18,8 @@ export const PHOTOS: Record<string, string | null> = {
 
 // Audio: put files in public/audio/ and write e.g. 'audio/voiceover.wav'.
 export const AUDIO = {
-	// Placeholder text-to-speech voice, regenerate with: python3 tools/make_placeholder_voiceover.py
-	voiceover: 'audio/placeholder-voiceover.wav' as string | null,
+	// Kokoro voice af_heart, regenerate with: python3 tools/make_voiceover.py
+	voiceover: 'audio/voiceover.wav' as string | null,
 	// Placeholder synth track, regenerate with: python3 tools/make_placeholder_music.py
 	music: 'audio/placeholder-synth.wav' as string | null,
 	// Kept low so the voice sits on top.

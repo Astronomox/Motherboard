@@ -17,20 +17,20 @@ const Part: React.FC<{ink?: Ink; children: React.ReactNode}> = ({ink, children})
 	);
 };
 
-const F = 'rgba(232,241,255,0.05)';
+const F = 'rgba(11,61,145,0.05)';
 
 export const BoardArt: React.FC<{ink: (id: string) => Ink | undefined; showCodes: number}> = ({ink, showCodes}) => (
 	<g fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth={3}>
 		{/* dimensions */}
-		<g stroke="rgba(232,241,255,.3)" strokeWidth={1.5}>
+		<g stroke="rgba(11,61,145,.3)" strokeWidth={1.5}>
 			<path d="M40 600h920M40 594v12M960 594v12" />
 			<path d="M20 40v520M14 40h12M14 560h12" />
 		</g>
-		<g fill="rgba(232,241,255,.6)" stroke="none" fontFamily="JetBrains Mono" fontSize={13} opacity={showCodes}>
+		<g fill="rgba(11,61,145,.6)" stroke="none" fontFamily="JetBrains Mono" fontSize={13} opacity={showCodes}>
 			<text x={500} y={592} textAnchor="middle">TOP SIDE · NOT TO SCALE</text>
 		</g>
 		{/* board outline and mounting holes */}
-		<path d="M60 40h360v14h170V40h350a20 20 0 0 1 20 20v480a20 20 0 0 1-20 20H60a20 20 0 0 1-20-20V60a20 20 0 0 1 20-20z" fill="rgba(232,241,255,.025)" stroke={C.line} strokeWidth={4} />
+		<path d="M60 40h360v14h170V40h350a20 20 0 0 1 20 20v480a20 20 0 0 1-20 20H60a20 20 0 0 1-20-20V60a20 20 0 0 1 20-20z" fill="rgba(11,61,145,.025)" stroke={C.line} strokeWidth={4} />
 		<g stroke={C.line} opacity={0.5} strokeWidth={2}>
 			<circle cx={70} cy={70} r={9} /><circle cx={930} cy={70} r={9} /><circle cx={70} cy={530} r={9} /><circle cx={930} cy={530} r={9} />
 			<circle cx={70} cy={70} r={4} /><circle cx={930} cy={70} r={4} /><circle cx={70} cy={530} r={4} /><circle cx={930} cy={530} r={4} />
@@ -61,7 +61,7 @@ export const BoardArt: React.FC<{ink: (id: string) => Ink | undefined; showCodes
 		<Part ink={ink('disp')}><rect x={440} y={62} width={130} height={30} rx={3} fill={F} /><path d="M450 70v14M460 70v14M470 70v14M480 70v14M490 70v14M500 70v14M510 70v14M520 70v14M530 70v14M540 70v14M550 70v14M560 70v14" /></Part>
 
 		{/* part codes, as printed on the silkscreen */}
-		<g fill="rgba(232,241,255,.62)" stroke="none" fontFamily="JetBrains Mono" fontSize={12} opacity={showCodes}>
+		<g fill="rgba(11,61,145,.62)" stroke="none" fontFamily="JetBrains Mono" fontSize={12} opacity={showCodes}>
 			<text x={86} y={124}>J_PWR</text><text x={180} y={212}>U_EC</text><text x={62} y={514}>J_BAT</text><text x={290} y={398}>L1–L4</text>
 			<text x={420} y={398}>U_CPU</text><text x={300} y={498}>U_SPI</text><text x={640} y={168}>U_DRAM</text><text x={630} y={522}>M.2 2280</text>
 			<text x={660} y={396}>U_PCH</text><text x={440} y={110}>J_EDP</text><text x={918} y={224} textAnchor="end">USB</text><text x={790} y={436}>WLAN</text>

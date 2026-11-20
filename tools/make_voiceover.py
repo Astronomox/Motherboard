@@ -1,24 +1,30 @@
-"""Generate the placeholder voiceover: public/audio/placeholder-voiceover.wav.
+"""Generate the voiceover: public/audio/voiceover.wav.
 
-Each script line is synthesised with Piper (an offline text-to-speech engine) and
-placed at the start of its scene, sped up if needed so it ends before the next scene.
+Each script line is read by Kokoro (an offline neural text-to-speech model) in a calm,
+warm voice, and placed at the start of its scene. A line is only sped up if it would
+run into the next scene.
 
-Setup:   pip install piper-tts numpy
-         python3 -m piper.download_voices en_US-ryan-high --data-dir tools/voices
-Run:     python3 tools/make_placeholder_voiceover.py
+Setup:   pip install kokoro-onnx soundfile numpy
+         Download kokoro-v1.0.onnx and voices-v1.0.bin into tools/kokoro/ from
+         https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.0
+Run:     python3 tools/make_voiceover.py            (default voice: af_heart)
+         python3 tools/make_voiceover.py bm_george  (any Kokoro voice name)
 """
-import io
 import wave
 from pathlib import Path
 
 import numpy as np
-from piper import PiperVoice, SynthesisConfig
+import sys
+
+from kokoro_onnx import Kokoro
 
 ROOT = Path(__file__).resolve().parent.parent
-VOICE = ROOT / "tools" / "voices" / "en_US-ryan-high.onnx"
+VOICE = sys.argv[1] if len(sys.argv) > 1 else "af_heart"
+LANG = "en-gb" if VOICE.startswith("b") else "en-us"
+CALM = 0.92  # below 1.0 is slower and calmer
 DUR = 56.0
 LEAD = 0.15  # seconds after the scene starts before the line begins
-GAP = 0.25  # keep this much silence before the next scene
+GAP = 0.2  # keep this much silence before the next scene
 
 # (start, end, line) in seconds. Matches SCENES in src/data.ts.
 LINES = [
@@ -38,17 +44,13 @@ LINES = [
     (53, 56, "Follow for part two: why laptops die."),
 ]
 
-voice = PiperVoice.load(str(VOICE))
-SR = voice.config.sample_rate
+kokoro = Kokoro(str(ROOT / "tools" / "kokoro" / "kokoro-v1.0.onnx"), str(ROOT / "tools" / "kokoro" / "voices-v1.0.bin"))
+SR = 24000
 
 
-def speak(text, length_scale):
-    buf = io.BytesIO()
-    with wave.open(buf, "wb") as w:
-        voice.synthesize_wav(text, w, syn_config=SynthesisConfig(length_scale=length_scale))
-    buf.seek(0)
-    with wave.open(buf) as r:
-        return np.frombuffer(r.readframes(r.getnframes()), "<i2").astype(np.float32) / 32767
+def speak(text, speed):
+    audio, _ = kokoro.create(text, voice=VOICE, speed=speed, lang=LANG)
+    return np.asarray(audio, np.float32)
 
 
 def trim(a, thresh=0.01):
@@ -59,19 +61,19 @@ def trim(a, thresh=0.01):
 out = np.zeros(int(DUR * SR), np.float32)
 for start, end, text in LINES:
     room = end - start - LEAD - GAP
-    scale = 0.95
-    clip = trim(speak(text, scale))
-    for _ in range(4):  # speech time isn't exactly linear in length_scale, so converge
+    speed = CALM
+    clip = trim(speak(text, speed))
+    for _ in range(4):  # speech time isn't exactly linear in speed, so converge
         if len(clip) / SR <= room:
             break
-        scale *= room / (len(clip) / SR) * 0.97
-        clip = trim(speak(text, scale))
+        speed *= (len(clip) / SR) / room * 1.03
+        clip = trim(speak(text, speed))
     i = int((start + LEAD) * SR)
     out[i: i + len(clip)] += clip[: len(out) - i]
-    print(f"{start:>4.0f}s  {len(clip) / SR:4.2f}s of {room:4.2f}s  speed x{0.95 / scale:4.2f}  {text}")
+    print(f"{start:>4.0f}s  {len(clip) / SR:4.2f}s of {room:4.2f}s  speed x{speed:4.2f}  {text}")
 
 out *= 10 ** (-1 / 20) / np.max(np.abs(out))
-dest = ROOT / "public" / "audio" / "placeholder-voiceover.wav"
+dest = ROOT / "public" / "audio" / "voiceover.wav"
 with wave.open(str(dest), "wb") as w:
     w.setnchannels(1)
     w.setsampwidth(2)

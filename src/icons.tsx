@@ -18,7 +18,7 @@ const P: Record<IconKey | 'power' | 'dead', {d: string[]; rects?: number[][]; ci
 	dead: {d: ['M21 10v4', 'M10 6.5l-1.5 4 3 1.5-2 5.5', 'M4 12h2.5l1-1.5 1 3 .8-1.5H13'], rects: [[2, 6.5, 17, 11, 1.8]], dot: [16, 12, 1.4]},
 };
 
-export const Icon: React.FC<{k: keyof typeof P; size: number; color?: string; accent: string; stroke?: number}> = ({k, size, color = '#E8F1FF', accent, stroke = 2}) => {
+export const Icon: React.FC<{k: keyof typeof P; size: number; color?: string; accent: string; stroke?: number}> = ({k, size, color = '#0B3D91', accent, stroke = 2}) => {
 	const p = P[k];
 	return (
 		<svg width={size} height={size} viewBox="0 0 24 24" style={{overflow: 'visible', display: 'block'}}>

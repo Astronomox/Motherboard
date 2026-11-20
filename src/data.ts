@@ -7,11 +7,13 @@ export const DH = 1920;
 export const CENTER: [number, number] = [540, 840];
 
 export const C = {
-	paper: '#0E3A6E',
-	deep: '#071F3D',
-	night: '#040E1D',
-	line: '#E8F1FF',
-	electron: '#F7FF5A',
+	paper: '#F7FAFF', // page white, a hair of blue
+	deep: '#E6EFFC', // edge of the vignette, laptop body
+	night: '#FFFFFF', // full-white cards (hook, end card)
+	line: '#0B3D91', // blueprint ink: linework and text
+	electron: '#FFD60A', // highlighter yellow: electron glow, spoken word
+	trail: '#FFA800', // the electron's path, deeper so it reads on white
+	tint: '#2F6FD6', // blue wash over photos
 };
 
 export type IconKey =
@@ -34,16 +36,16 @@ export type Stop = {
 };
 
 export const STOPS: Stop[] = [
-	{key: 'doorbell', sc: '03', t: '0:06', start: 6, label: 'The doorbell', color: '#FFB347', parts: ['btn', 'ec'], at: [210, 160], pin: [210, 126], zoom: 2.9, hud: '5.0 V STANDBY', vo: 'The button rings the doorbell. A tiny chip, the embedded controller, wakes up first.'},
-	{key: 'reservoir', sc: '04', t: '0:10', start: 10, label: 'The reservoir', color: '#4FF0B4', parts: ['bat'], at: [110, 474], pin: [110, 450], zoom: 3.2, hud: '19.5 V IN', vo: 'It opens the reservoir. Power flows in from the battery or charger.'},
-	{key: 'station', sc: '05', t: '0:14', start: 14, label: 'Power station', color: '#FF6B3D', parts: ['vrm1', 'vrm2', 'vrm3', 'vrm4'], at: [344, 288], pin: [344, 192], zoom: 2.6, hud: '19 V → ~1 V', vo: 'But it is too strong. The power station steps it down to about one volt for the CPU.'},
-	{key: 'hall', sc: '06', t: '0:19', start: 19, label: 'City hall', color: '#FFC93C', parts: ['cpu'], at: [505, 295], pin: [505, 206], zoom: 2.5, hud: 'VCORE 1.05 V', vo: 'City hall wakes up. But it has no idea what to do.'},
-	{key: 'rulebook', sc: '07', t: '0:23', start: 23, label: 'The rulebook', color: '#C9A8FF', parts: ['bios'], at: [322, 457], pin: [322, 426], zoom: 3.6, hud: 'SPI FLASH · 16 MB', vo: 'So it reads the rulebook. The BIOS chip holds the first instructions.'},
-	{key: 'desk', sc: '08', t: '0:27', start: 27, label: 'The desk', color: '#FF8AC4', parts: ['ram1', 'ram2', 'ram3', 'ram4'], at: [770, 115], pin: [770, 76], zoom: 2.4, hud: 'DDR4 · 2400 MT/s', vo: 'Next, its desk. The RAM, where it keeps what it is working on right now.'},
-	{key: 'warehouse', sc: '09', t: '0:31', start: 31, label: 'The warehouse', color: '#9EE8FF', parts: ['ssd'], at: [760, 472], pin: [760, 436], zoom: 2.4, hud: 'NVMe · M.2 2280', vo: 'Then the warehouse. The SSD, where your system and files live.'},
-	{key: 'roads', sc: '10', t: '0:35', start: 35, label: 'The roads', color: '#F0A36B', parts: ['road'], at: [652, 280], pin: [652, 232], zoom: 3.4, hud: 'TRACE 0.1 mm', vo: 'Everything moves on these roads. Copper lines thinner than a hair.'},
-	{key: 'gates', sc: '11', t: '0:40', start: 40, label: 'City gates', color: '#A6FF6B', parts: ['pch', 'usb1', 'usb2', 'hdmi', 'wifi'], at: [700, 340], pin: [700, 296], zoom: 2.1, hud: 'USB · WI-FI · KEYBOARD', vo: 'The gates open. USB, Wi-Fi, keyboard, all connected.'},
-	{key: 'lights', sc: '12', t: '0:44', start: 44, label: 'Lights on', color: '#FFFFFF', parts: ['disp'], at: [505, 77], pin: [505, 58], zoom: 3.0, hud: 'eDP · LINK UP', vo: 'Last stop, the screen. Lights on.'},
+	{key: 'doorbell', sc: '03', t: '0:06', start: 6, label: 'The doorbell', color: '#E07B00', parts: ['btn', 'ec'], at: [210, 160], pin: [210, 126], zoom: 2.9, hud: '5.0 V STANDBY', vo: 'The button rings the doorbell. A tiny chip, the embedded controller, wakes up first.'},
+	{key: 'reservoir', sc: '04', t: '0:10', start: 10, label: 'The reservoir', color: '#00A37A', parts: ['bat'], at: [110, 474], pin: [110, 450], zoom: 3.2, hud: '19.5 V IN', vo: 'It opens the reservoir. Power flows in from the battery or charger.'},
+	{key: 'station', sc: '05', t: '0:14', start: 14, label: 'Power station', color: '#F0441C', parts: ['vrm1', 'vrm2', 'vrm3', 'vrm4'], at: [344, 288], pin: [344, 192], zoom: 2.6, hud: '19 V → ~1 V', vo: 'But it is too strong. The power station steps it down to about one volt for the CPU.'},
+	{key: 'hall', sc: '06', t: '0:19', start: 19, label: 'City hall', color: '#C99A00', parts: ['cpu'], at: [505, 295], pin: [505, 206], zoom: 2.5, hud: 'VCORE 1.05 V', vo: 'City hall wakes up. But it has no idea what to do.'},
+	{key: 'rulebook', sc: '07', t: '0:23', start: 23, label: 'The rulebook', color: '#7C4DFF', parts: ['bios'], at: [322, 457], pin: [322, 426], zoom: 3.6, hud: 'SPI FLASH · 16 MB', vo: 'So it reads the rulebook. The BIOS chip holds the first instructions.'},
+	{key: 'desk', sc: '08', t: '0:27', start: 27, label: 'The desk', color: '#E0307E', parts: ['ram1', 'ram2', 'ram3', 'ram4'], at: [770, 115], pin: [770, 76], zoom: 2.4, hud: 'DDR4 · 2400 MT/s', vo: 'Next, its desk. The RAM, where it keeps what it is working on right now.'},
+	{key: 'warehouse', sc: '09', t: '0:31', start: 31, label: 'The warehouse', color: '#0091D5', parts: ['ssd'], at: [760, 472], pin: [760, 436], zoom: 2.4, hud: 'NVMe · M.2 2280', vo: 'Then the warehouse. The SSD, where your system and files live.'},
+	{key: 'roads', sc: '10', t: '0:35', start: 35, label: 'The roads', color: '#B5602A', parts: ['road'], at: [652, 280], pin: [652, 232], zoom: 3.4, hud: 'TRACE 0.1 mm', vo: 'Everything moves on these roads. Copper lines thinner than a hair.'},
+	{key: 'gates', sc: '11', t: '0:40', start: 40, label: 'City gates', color: '#3A9A12', parts: ['pch', 'usb1', 'usb2', 'hdmi', 'wifi'], at: [700, 340], pin: [700, 296], zoom: 2.1, hud: 'USB · WI-FI · KEYBOARD', vo: 'The gates open. USB, Wi-Fi, keyboard, all connected.'},
+	{key: 'lights', sc: '12', t: '0:44', start: 44, label: 'Lights on', color: '#0B3D91', parts: ['disp'], at: [505, 77], pin: [505, 58], zoom: 3.0, hud: 'eDP · LINK UP', vo: 'Last stop, the screen. Lights on.'},
 ];
 
 export const TRAVEL = 24; // frames the electron spends moving between stops
