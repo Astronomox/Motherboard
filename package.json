@@ -1,0 +1,24 @@
+{
+  "name": "motherboard",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Press power. A city wakes up. A 4K 9:16 explainer video built with Remotion.",
+  "scripts": {
+    "studio": "remotion studio",
+    "render:4k": "remotion render CityWakes out/city-wakes-4k.mp4 --codec=h264 --crf=10 --image-format=png --pixel-format=yuv420p --concurrency=4",
+    "render:prores": "remotion render CityWakes out/city-wakes-4k.mov --codec=prores --prores-profile=4444 --image-format=png --concurrency=4",
+    "render:draft": "remotion render CityWakesDraft out/city-wakes-draft.mp4 --codec=h264 --crf=20",
+    "stills": "remotion still CityWakes out/still.png --frame=430 --image-format=png"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.540",
+    "@remotion/google-fonts": "4.0.540",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.540"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}
