@@ -56,7 +56,7 @@ export const STOPS: Stop[] = [
 ];
 
 for (const s of STOPS) {
-	s.start = sc(s.key).start;
+	s.start = fr(sc(s.key).start) / FPS; // snapped to a whole frame, so scenes meet with no gap
 	s.t = mmss(s.start);
 }
 
