@@ -4,7 +4,7 @@ import {loadFont as loadDisplay} from '@remotion/google-fonts/SpaceGrotesk';
 import {loadFont as loadBody} from '@remotion/google-fonts/Inter';
 import {loadFont as loadMono} from '@remotion/google-fonts/JetBrainsMono';
 import {
-	C, CENTER, CTA, DH, DW, FPS, LAPTOP_CUT, PAYOFF, pointAt, ROUTE_D, ROUTE_LEN,
+	C, CENTER, CITY_START, CTA, DH, DW, FPS, HOOK_END, LAPTOP_CUT, PAYOFF, SCENE_TIME, pointAt, ROUTE_D, ROUTE_LEN,
 	SCENES, STOP_LEN, STOPS, TRAVEL,
 } from './data';
 import {BoardArt, Ink} from './Board';
@@ -25,7 +25,7 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 type Cam = {cx: number; cy: number; z: number};
 const OVERVIEW: Cam = {cx: 500, cy: 300, z: 1.04};
 const stopCam = (i: number): Cam => ({cx: STOPS[i].at[0], cy: STOPS[i].at[1], z: STOPS[i].zoom});
-const stopEnd = (i: number) => (i < STOPS.length - 1 ? STOPS[i + 1].start : 48) * FPS;
+const stopEnd = (i: number) => SCENES.find((s) => s.id === STOPS[i].key)!.end;
 const PUSH = 0.07; // slow push-in while dwelling
 
 const currentStop = (f: number) => {
@@ -35,7 +35,7 @@ const currentStop = (f: number) => {
 
 const camera = (f: number): Cam => {
 	if (f < STOPS[0].start * FPS) {
-		return {...OVERVIEW, z: interpolate(f, [90, 180], [0.9, 1.04], {...clamp, easing: Easing.out(Easing.quad)})};
+		return {...OVERVIEW, z: interpolate(f, [CITY_START, STOPS[0].start * FPS], [0.9, 1.04], {...clamp, easing: Easing.out(Easing.quad)})};
 	}
 	if (f >= PAYOFF) {
 		const k = interpolate(f, [PAYOFF, PAYOFF + 75], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
@@ -120,7 +120,7 @@ const Captions: React.FC<{f: number}> = ({f}) => {
 	const sc = SCENES.find((s) => f >= s.start && f < s.end);
 	if (!sc) return null;
 	const words = sc.vo.split(' ');
-	const a = sc.start + 4, b = sc.end - 10;
+	const a = sc.voStart, b = sc.voEnd;
 	const n = interpolate(f, [a, b], [0, words.length], clamp);
 	const fadeOut = interpolate(f, [sc.end - 6, sc.end], [1, 0], clamp);
 	return (
@@ -160,9 +160,9 @@ const Title: React.FC<{f: number}> = ({f}) => {
 const Hud: React.FC<{f: number}> = ({f}) => {
 	const i = currentStop(f);
 	let left = '', right = '';
-	if (f >= 90 && f < STOPS[0].start * FPS) { left = 'SC 02 · 0:03'; right = 'S5 → S0'; }
+	if (f >= CITY_START && f < STOPS[0].start * FPS) { left = `SC 02 · ${SCENE_TIME('city')}`; right = 'S5 → S0'; }
 	else if (i >= 0 && f < LAPTOP_CUT) { left = `SC ${STOPS[i].sc} · ${STOPS[i].t}`; right = STOPS[i].hud; }
-	else if (f >= PAYOFF && f < CTA) { left = 'SC 13 · 0:48'; right = 'ALL SYSTEMS ON'; }
+	else if (f >= PAYOFF && f < CTA) { left = `SC 13 · ${SCENE_TIME('payoff')}`; right = 'ALL SYSTEMS ON'; }
 	if (!left) return null;
 	const box: React.CSSProperties = {background: 'rgba(255,255,255,.88)', border: '2px solid rgba(11,61,145,.3)', padding: '10px 18px'};
 	const blink = Math.floor(f / 15) % 2 === 0;
@@ -176,7 +176,7 @@ const Hud: React.FC<{f: number}> = ({f}) => {
 
 const PhotoLayer: React.FC<{f: number}> = ({f}) => {
 	const i = currentStop(f);
-	const key = f >= PAYOFF || (f >= 90 && f < STOPS[0].start * FPS) ? 'board' : i >= 0 ? STOPS[i].key : null;
+	const key = f >= PAYOFF || (f >= CITY_START && f < STOPS[0].start * FPS) ? 'board' : i >= 0 ? STOPS[i].key : null;
 	const src = key ? PHOTOS[key] : null;
 	if (!src) return null;
 	const sc = SCENES.find((s) => f >= s.start && f < s.end)!;
@@ -195,30 +195,33 @@ const PhotoLayer: React.FC<{f: number}> = ({f}) => {
 /* ---------- special scenes ---------- */
 
 const Hook: React.FC<{f: number}> = ({f}) => {
-	if (f >= 90) return null;
-	const press = f < 16;
-	const s = press ? interpolate(f, [0, 8, 11, 16], [1.06, 1, 0.9, 1], clamp) : 1;
-	const ring = interpolate(f, [10, 22], [0, 1], clamp);
+	if (f >= HOOK_END) return null;
+	// The button sits for a beat, breathing, then is pressed at frame 28 (0.93s). Cut to the question at 40.
+	const P = 28;
+	const press = f < P + 12;
+	const breathe = 1 + 0.015 * Math.sin(f / 5);
+	const s = press ? (f < P - 4 ? interpolate(f, [0, 14], [1.08, 1], {...clamp, easing: Easing.out(Easing.cubic)}) * breathe : interpolate(f, [P - 4, P, P + 6], [1, 0.88, 1], clamp)) : 1;
+	const ring = interpolate(f, [P, P + 14], [0, 1], clamp);
 	const words = 'What happens in the next 2 seconds?'.split(' ');
 	return (
 		<AbsoluteFill style={{background: PAPER_GRID}}>
 			{press ? (
 				<AbsoluteFill style={{alignItems: 'center', justifyContent: 'center'}}>
-					<div style={{width: 520, height: 520, borderRadius: 260, border: `8px solid ${C.line}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${s})`, boxShadow: f > 10 ? `0 0 ${120 * (1 - ring)}px ${C.electron}` : 'none'}}>
-						<Icon k="power" size={280} accent={C.electron} color={f > 10 ? C.trail : C.line} stroke={1.6} />
+					<div style={{width: 520, height: 520, borderRadius: 260, border: `8px solid ${C.line}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${s})`, boxShadow: f > P ? `0 0 ${120 * (1 - ring)}px ${C.electron}` : 'none'}}>
+						<Icon k="power" size={280} accent={C.electron} color={f > P ? C.trail : C.line} stroke={1.6} />
 					</div>
-					<div style={{position: 'absolute', width: 520, height: 520, borderRadius: 260, border: `6px solid ${C.electron}`, transform: `scale(${1 + ring * 1.4})`, opacity: f > 10 ? 1 - ring : 0}} />
+					<div style={{position: 'absolute', width: 520, height: 520, borderRadius: 260, border: `6px solid ${C.electron}`, transform: `scale(${1 + ring * 1.4})`, opacity: f > P ? 1 - ring : 0}} />
 				</AbsoluteFill>
 			) : (
 				<div style={{position: 'absolute', left: 80, right: 80, top: 560, textAlign: 'center', fontFamily: display, fontWeight: 700, fontSize: 116, lineHeight: 1.02, textTransform: 'uppercase', color: C.line}}>
 					{words.map((w, i) => {
-						const o = interpolate(f, [20 + i * 4, 24 + i * 4], [0, 1], clamp);
+						const o = interpolate(f, [P + 14 + i * 6, P + 19 + i * 6], [0, 1], clamp);
 						return <span key={i} style={{display: 'inline-block', marginRight: '0.22em', opacity: o, color: C.line, background: w.startsWith('2') ? C.electron : 'transparent', borderRadius: 12, padding: '0 0.08em'}}>{w}</span>;
 					})}
 				</div>
 			)}
 			{/* flash on press */}
-			<AbsoluteFill style={{background: C.electron, opacity: interpolate(f, [15, 16, 20], [0, 0.7, 0], clamp)}} />
+			<AbsoluteFill style={{background: C.electron, opacity: interpolate(f, [P + 11, P + 12, P + 17], [0, 0.7, 0], clamp)}} />
 		</AbsoluteFill>
 	);
 };
@@ -286,7 +289,7 @@ export const CityWakes: React.FC = () => {
 
 	// electron
 	const ePos = project(pointAt(L), cam);
-	const eOpacity = interpolate(f, [110, 124], [0, 1], clamp) * interpolate(f, [PAYOFF, PAYOFF + 12], [1, 0], clamp);
+	const eOpacity = interpolate(f, [CITY_START + 20, CITY_START + 34], [0, 1], clamp) * interpolate(f, [PAYOFF, PAYOFF + 12], [1, 0], clamp);
 	const moving = i >= 0 && f - STOPS[i].start * FPS < TRAVEL;
 	const pulse = 1 + 0.12 * Math.sin(f / 3);
 
@@ -359,7 +362,7 @@ export const CityWakes: React.FC = () => {
 				<Laptop f={f} />
 				{f >= LAPTOP_CUT && f < PAYOFF && <Captions f={f} />}
 				<Hook f={f} />
-				{f < 90 && <Captions f={f} />}
+				{f < HOOK_END && <Captions f={f} />}
 				<Cta f={f} />
 				{f >= CTA && <Captions f={f} />}
 				{/* fade from the laptop back into the city */}
